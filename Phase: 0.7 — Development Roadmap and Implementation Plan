@@ -1,0 +1,396 @@
+# Phase 0.7 — Development Roadmap and Implementation Plan
+
+**Phase:** 0.7 — Development Roadmap and Implementation Plan
+**Type:** Permanent Execution Roadmap Documentation (No Code)
+**Depends On:** `README.md`, `docs/Phase-0.2-Project-Folder-Structure.md`, `docs/Phase-0.3-Technology-Stack-and-Development-Standards.md`, `docs/Phase-0.4-Design-System-and-UI-Standards.md`, `docs/Phase-0.5-Database-Schema-Planning.md`, `docs/Phase-0.6-API-Specification-and-Backend-Contracts.md`
+**Status:** Locked — this document defines the binding execution roadmap for every future implementation phase
+
+---
+
+## Purpose of This Document
+
+This document is the permanent execution roadmap for MemeTools. It lays out every remaining implementation phase in order, defines a consistent template every phase must follow, and locks the development, testing, deployment, and release practices that govern how the project moves from foundational documentation (Phases 0.1–0.7) to a production-ready platform.
+
+This document does not implement anything. It exists so that at the start of any future session, the question "what phase are we on, what does it need to deliver, and what comes next" has one unambiguous answer.
+
+---
+
+# 1. Project Development Philosophy
+
+- **Why phase-by-phase:** MemeTools is being built by a solo developer across many separate sessions, often with significant time gaps between them. Phase-by-phase development ensures that at any point in time, exactly one unit of work is active, its scope is fully written down, and the rest of the system is in a known, stable state. This is what makes the project resumable without re-deriving context each time.
+- **Rules for incremental development:**
+  1. Only one phase is actively implemented at a time.
+  2. A phase does not begin until its dependencies (prior phases) are complete, per this roadmap.
+  3. A phase's scope is fixed once it begins — new ideas that surface mid-phase are recorded for a future phase, not folded into the current one.
+- **Never skip phases:** Every phase in Section 2 exists because a later phase depends on it. Skipping ahead (e.g. building the Prediction Engine before Markets exist) would create implicit, undocumented dependencies that contradict the project's core principle of explicit, written context.
+- **Production-ready before moving forward:** A phase is not "done" when it technically runs — it is done when it meets its own Completion Criteria (Section 3's template) and could be shipped as-is. This mirrors the README's and Phase 0.3's shared principle that nothing is left as a placeholder or known-broken while the project moves on.
+
+---
+
+# 2. Complete Development Roadmap
+
+The following phases represent every remaining implementation phase, in required order. Foundational documentation phases (0.1–0.7) precede this list and are already complete or in progress.
+
+| Phase | Name |
+|---|---|
+| 1 | Project Initialization |
+| 2 | Authentication |
+| 3 | Database Integration |
+| 4 | User Profiles |
+| 5 | Categories |
+| 6 | Markets |
+| 7 | Market Details |
+| 8 | Prediction Engine |
+| 9 | Portfolio |
+| 10 | Leaderboards |
+| 11 | Points System |
+| 12 | Rewards & Achievements |
+| 13 | Activity Feed |
+| 14 | Notifications |
+| 15 | Search |
+| 16 | Settings |
+| 17 | Admin Panel |
+| 18 | Performance Optimization |
+| 19 | Security Hardening |
+| 20 | Testing |
+| 21 | Deployment |
+| 22 | Production Launch |
+
+No phase may be reordered, merged, or skipped without an explicit, documented amendment to this roadmap, approved by the project owner.
+
+---
+
+# 3. Every Phase Template
+
+Every phase listed in Section 2 must be documented, at the time it becomes active, using exactly the following template. This ensures every phase's documentation is structurally identical regardless of which session writes it.
+
+### Purpose
+A one-paragraph statement of what the phase exists to accomplish and why it matters to the overall product.
+
+### Scope
+The specific, bounded set of functionality the phase will deliver — written narrowly enough that "is this in scope?" has an obvious answer for any given feature idea.
+
+### Dependencies
+Which prior phases (and which specific deliverables from them) this phase requires to already exist before it can begin.
+
+### Deliverables
+The concrete artifacts the phase will produce (e.g. specific pages, specific API modules per Phase 0.6, specific database tables per Phase 0.5) — described narratively, not as code.
+
+### Completion Criteria
+The specific, checkable conditions that must be true for the phase to be considered done — mirroring the Completion Criteria pattern already used in Phases 0.1–0.6.
+
+### Out of Scope
+An explicit list of adjacent functionality that is deliberately deferred to a later phase, to prevent scope creep during implementation.
+
+Below is how this template applies to each phase at a roadmap level. Each phase's full, detailed spec is still written separately (per Phase 0.3's Documentation Standards) when that phase becomes active — the summaries below establish the boundaries that detailed spec must respect.
+
+---
+
+### Phase 1 — Project Initialization
+- **Purpose:** Stand up the actual project codebase and static homepage matching the approved prototype.
+- **Scope:** Repository/project setup using the locked stack (Phase 0.3), the folder structure (Phase 0.2), and a fully static homepage implementing the design system (Phase 0.4) — no auth, no live data, no backend calls.
+- **Dependencies:** Phases 0.2, 0.3, 0.4.
+- **Deliverables:** A running frontend application rendering the homepage pixel-faithful to the prototype, using placeholder/static data only.
+- **Completion Criteria:** The homepage visually matches the prototype across desktop and the responsive rules in Phase 0.4; no functionality beyond static rendering exists yet.
+- **Out of Scope:** Any real data, any backend, any authentication, any other page.
+
+### Phase 2 — Authentication
+- **Purpose:** Enable real user accounts.
+- **Scope:** Sign up, log in, log out, and session handling via Supabase Auth (Phase 0.3), implementing the Authentication and Users API modules (Phase 0.6).
+- **Dependencies:** Phase 1; Phase 0.5 (Users entity); Phase 0.6 (Authentication, Users modules).
+- **Deliverables:** Working sign-up/login/logout flows; session-aware app shell (showing "Log in/Sign up" vs. an authenticated state).
+- **Completion Criteria:** A user can create an account, log in, remain logged in across a session, and log out, with all rules from Phase 0.6's Authentication Rules enforced.
+- **Out of Scope:** Profile editing, any feature beyond identity and session management.
+
+### Phase 3 — Database Integration
+- **Purpose:** Stand up the real, persistent data layer.
+- **Scope:** Implementing the core entities from Phase 0.5 (Users, Profiles, Points Balance, Points Transactions at minimum) as actual Prisma models against PostgreSQL, per Phase 0.3.
+- **Dependencies:** Phase 2; Phase 0.5 (full entity model); Phase 0.3 (Prisma/PostgreSQL).
+- **Deliverables:** A working schema and data-access layer supporting the entities needed by subsequent phases.
+- **Completion Criteria:** Core entities persist correctly, relationships match Phase 0.5 exactly, and deletion rules (soft/hard delete, per Phase 0.5 Section 6) are correctly implemented.
+- **Out of Scope:** Market/Prediction-specific entities, which are introduced in their own phases as needed.
+
+### Phase 4 — User Profiles
+- **Purpose:** Give every user a public-facing identity.
+- **Scope:** Profiles entity implementation and the Profiles API module (Phase 0.6); profile viewing and editing UI.
+- **Dependencies:** Phases 2, 3.
+- **Deliverables:** Public profile pages/components and an editable "my profile" experience.
+- **Completion Criteria:** A user can view their own and others' public profiles, and edit their own, consistent with Phase 0.5's ownership rules.
+- **Out of Scope:** Settings/preferences (Phase 16), Portfolio/Leaderboard integration (their own phases).
+
+### Phase 5 — Categories
+- **Purpose:** Support the category browsing structure shown in the sidebar.
+- **Scope:** Categories entity, Categories API module, and category display in the sidebar/UI.
+- **Dependencies:** Phase 3.
+- **Deliverables:** A real, database-backed category list replacing the Phase 1 static placeholder, matching Phase 0.4's sidebar design exactly.
+- **Completion Criteria:** Categories display correctly with real active/"Soon" status and accurate market counts (initially zero until Phase 6).
+- **Out of Scope:** Market data itself.
+
+### Phase 6 — Markets
+- **Purpose:** Introduce real, browsable markets.
+- **Scope:** Markets and Market Options entities; Markets API module; Markets browsing/search/filter UI.
+- **Dependencies:** Phases 3, 5.
+- **Deliverables:** A real Markets listing and browsing experience replacing Phase 1's static Trending Markets placeholder.
+- **Completion Criteria:** Markets can be listed, filtered by category, searched, and sorted, consistent with Phase 0.6's Markets module contract.
+- **Out of Scope:** Placing predictions, market detail pages (Phase 7), admin market creation (Phase 17, though basic seeding may be needed earlier as a documented exception).
+
+### Phase 7 — Market Details
+- **Purpose:** Give each market a dedicated detail view.
+- **Scope:** Market Detail page/UI and any additional API needs beyond the base Markets module.
+- **Dependencies:** Phase 6.
+- **Deliverables:** A market detail page showing full market information, ready to host prediction placement in Phase 8.
+- **Completion Criteria:** A user can navigate from a market row to a full detail view showing all relevant market data.
+- **Out of Scope:** Actual prediction placement logic.
+
+### Phase 8 — Prediction Engine
+- **Purpose:** Enable the platform's core action — placing predictions with Points.
+- **Scope:** Predictions and Prediction History entities; Predictions API module; prediction placement UI on the Market Detail page; market lifecycle/settlement logic (per Phase 0.5 Section 8).
+- **Dependencies:** Phases 3, 7; Phase 11 (Points System) must be sequenced carefully — see Dependency Note below.
+- **Deliverables:** Working end-to-end prediction placement, locking, and settlement flow.
+- **Completion Criteria:** A user can place a prediction, see it locked when its market closes, and see it resolve correctly at settlement, with all Points movements correctly ledgered.
+- **Out of Scope:** Portfolio aggregation UI (Phase 9), Leaderboard impact (Phase 10).
+- **Dependency Note:** Because Predictions inherently require Points movement, a minimal Points ledger capability must exist by this phase even though the full Points System phase is numbered later; this is resolved by implementing the foundational Points Transactions/Balance data layer as part of Phase 3, with Phase 11 building the complete user-facing Points experience on top of it.
+
+### Phase 9 — Portfolio
+- **Purpose:** Give users a summary view of their current standing.
+- **Scope:** Portfolio and Portfolio History entities; Portfolio API module; Portfolio UI.
+- **Dependencies:** Phase 8.
+- **Deliverables:** A working Portfolio page showing current holdings and historical trend.
+- **Completion Criteria:** Portfolio accurately reflects a user's active predictions and historical snapshots, consistent with Phase 0.5's derived-data philosophy.
+- **Out of Scope:** Leaderboard ranking logic.
+
+### Phase 10 — Leaderboards
+- **Purpose:** Rank users by performance.
+- **Scope:** Leaderboard entity; Leaderboard API module; Leaderboard UI.
+- **Dependencies:** Phases 8, 9.
+- **Deliverables:** A working, periodically-refreshed leaderboard.
+- **Completion Criteria:** Leaderboard displays accurate rankings computed from Prediction History and Points Transactions, per Phase 0.5's computed-projection philosophy.
+- **Out of Scope:** Achievement-based recognitions (Phase 12).
+
+### Phase 11 — Points System
+- **Purpose:** Complete the full user-facing Points experience.
+- **Scope:** Full Points and Points Transactions API modules; Points display throughout the UI (navbar, Portfolio); Points history view.
+- **Dependencies:** Phase 3's foundational ledger (per Phase 8's Dependency Note).
+- **Deliverables:** A complete, transparent Points experience, including a user-facing transaction history view.
+- **Completion Criteria:** Every Points movement anywhere in the product is visible and traceable to the user through this system.
+- **Out of Scope:** Reward-specific claiming logic (Phase 12).
+
+### Phase 12 — Rewards & Achievements
+- **Purpose:** Deliver the XP/perks program teased in the prototype.
+- **Scope:** Rewards and Achievements entities; Rewards/Achievements API modules; Rewards UI.
+- **Dependencies:** Phase 11.
+- **Deliverables:** A working Rewards Program experience, including achievement tracking and reward claiming.
+- **Completion Criteria:** Users can view available rewards/achievements, track progress, and claim eligible rewards, with all resulting Points movements correctly ledgered.
+- **Out of Scope:** Admin-side reward definition management (Phase 17, though basic seeding may be required earlier as a documented exception).
+
+### Phase 13 — Activity Feed
+- **Purpose:** Surface a live, global feed of platform activity.
+- **Scope:** Activity Feed entity; Activity Feed API module; Recent Activity UI, replacing Phase 1's static placeholder.
+- **Dependencies:** Phase 8 (predictions as a primary activity source).
+- **Deliverables:** A real, live-updating Activity Feed.
+- **Completion Criteria:** Activity Feed accurately reflects real platform events in chronological order, matching Phase 0.4's design.
+- **Out of Scope:** Per-user Notifications (Phase 14).
+
+### Phase 14 — Notifications
+- **Purpose:** Deliver targeted, per-user alerts.
+- **Scope:** Notifications entity; Notifications API module; Notifications UI.
+- **Dependencies:** Phase 13.
+- **Deliverables:** A working notifications experience with read/unread state.
+- **Completion Criteria:** Users receive notifications for relevant events (e.g. a prediction resolving) and can manage read state.
+- **Out of Scope:** Notification preference configuration (Phase 16).
+
+### Phase 15 — Search
+- **Purpose:** Make the platform's content findable.
+- **Scope:** Full implementation of the search bar shown in the prototype, backed by the search philosophy in Phase 0.6.
+- **Dependencies:** Phase 6.
+- **Deliverables:** A working, performant search experience across Markets (and any other searchable content identified at this phase).
+- **Completion Criteria:** Search returns accurate, relevant results with acceptable performance at the scale anticipated in Phase 0.5.
+- **Out of Scope:** Search-driven recommendations or discovery algorithms beyond direct query matching.
+
+### Phase 16 — Settings
+- **Purpose:** Give users control over their account configuration.
+- **Scope:** User Settings entity; User Settings API module; Settings UI, including notification preferences.
+- **Dependencies:** Phases 4, 14.
+- **Deliverables:** A working account settings experience.
+- **Completion Criteria:** Users can view and update their settings, and those settings correctly affect platform behavior (e.g. notification delivery).
+- **Out of Scope:** Admin-level configuration (System Configuration, Phase 17).
+
+### Phase 17 — Admin Panel
+- **Purpose:** Give the project owner (as Admin) tools to manage the platform.
+- **Scope:** Admin Users, Admin Actions, System Configuration, and Audit Logs entities; the full Admin API module; an Admin UI covering Market/Category/Reward management and audit log review, per Phase 0.6 Section 12.
+- **Dependencies:** Phases 6, 12; core data layer from Phase 3.
+- **Deliverables:** A working Admin Panel sufficient to operate the platform without direct database access.
+- **Completion Criteria:** All administrative operations identified in Phase 0.6 are available, authorized, and logged correctly.
+- **Out of Scope:** Advanced permission granularity beyond what Phase 0.6 anticipates (deferred to a future, explicitly scoped enhancement).
+
+### Phase 18 — Performance Optimization
+- **Purpose:** Ensure the platform performs well under real usage.
+- **Scope:** Applying the caching, pagination, indexing, and bundle-optimization philosophies from Phases 0.3 and 0.6 in practice, across the now-complete feature set.
+- **Dependencies:** All preceding functional phases (1–17).
+- **Deliverables:** Measured performance improvements across frontend load time, API response time, and database query performance.
+- **Completion Criteria:** Defined performance benchmarks (established at the start of this phase) are met across key user flows (homepage load, market browsing, prediction placement).
+- **Out of Scope:** New features of any kind.
+
+### Phase 19 — Security Hardening
+- **Purpose:** Verify and strengthen the platform's security posture before launch.
+- **Scope:** A full review against the Security Standards in Phases 0.3 and 0.6 — authentication, authorization, input sanitization, rate limiting, secrets handling.
+- **Dependencies:** All preceding functional phases.
+- **Deliverables:** A documented security review and remediation of any findings.
+- **Completion Criteria:** No known high-severity security gaps remain against the standards already locked in this project's documentation.
+- **Out of Scope:** New features of any kind.
+
+### Phase 20 — Testing
+- **Purpose:** Establish confidence in the platform's correctness before launch.
+- **Scope:** Applying the Testing Strategy defined in Section 7 of this document across all implemented functionality.
+- **Dependencies:** All preceding functional phases.
+- **Deliverables:** A test suite covering critical paths (authentication, prediction placement/settlement, Points integrity) and a documented manual testing pass.
+- **Completion Criteria:** Critical paths are covered by automated tests, and a full manual regression pass finds no blocking issues.
+- **Out of Scope:** New features of any kind.
+
+### Phase 21 — Deployment
+- **Purpose:** Stand up the real, production infrastructure.
+- **Scope:** Implementing the Deployment Roadmap in Section 8 — environment separation, staging, and production deployment using Vercel, Railway, Supabase, and Cloudflare, per Phase 0.3.
+- **Dependencies:** Phases 18, 19, 20.
+- **Deliverables:** A fully deployed staging environment, validated, followed by a production environment.
+- **Completion Criteria:** The platform runs correctly in a production-equivalent environment with the custom domain and DNS configured, per Phase 0.3.
+- **Out of Scope:** The public launch itself (Phase 22).
+
+### Phase 22 — Production Launch
+- **Purpose:** Officially launch the platform.
+- **Scope:** Final pre-launch checks against the Success Criteria in Section 12, and the actual go-live.
+- **Dependencies:** Phase 21.
+- **Deliverables:** A live, publicly accessible production platform.
+- **Completion Criteria:** All Success Criteria in Section 12 are met.
+- **Out of Scope:** Post-launch feature development, which proceeds under the Maintenance Philosophy in Section 10.
+
+---
+
+# 4. Development Rules
+
+- **No feature skipping:** No phase's scope is partially implemented and left incomplete while a later phase begins.
+- **No duplicate code:** Consistent with Phase 0.3's Development Standards — shared logic is always extracted and reused, never copy-pasted across phases.
+- **No redesigning approved UI:** Every phase that touches the frontend must conform exactly to Phase 0.4's design system and the approved prototype — no phase introduces new visual patterns without an explicit, documented amendment.
+- **Documentation before implementation:** Every phase's detailed spec document (per the template in Section 3) is written and committed before that phase's implementation commits begin, per Phase 0.3's Documentation Standards.
+- **Testing before completion:** No phase is marked complete without satisfying its own Completion Criteria and, from Phase 20 onward, the broader Testing Strategy in Section 7.
+
+---
+
+# 5. Git Workflow
+
+- **Branch naming:** `phase-<number>-<short-description>` (e.g. `phase-8-prediction-engine`), consistent with the convention already locked in the README and Phase 0.3.
+- **Commit naming:** Conventional commit prefixes (`feat:`, `fix:`, `refactor:`, `style:`, `docs:`, `chore:`), consistent with Phase 0.3's Git Standards.
+- **Merge policy:** A phase's branch is merged into `main` only once it satisfies its Completion Criteria; `main` always represents a working, production-ready state of the project.
+- **Version tagging:** Each completed phase is tagged (e.g. `phase-8-complete`), providing a clear, navigable history of the project's incremental growth.
+- **Milestone rules:** Major roadmap milestones — completion of the foundational documentation set (Phase 0.7, this document), completion of the core prediction loop (Phases 1–11), and Production Launch (Phase 22) — are tagged as named milestones in addition to per-phase tags.
+
+---
+
+# 6. Quality Standards
+
+- **Frontend quality:** Every UI element matches Phase 0.4's design system exactly; components follow Phase 0.3's coding standards (strict typing, feature-first organization, no duplicated components).
+- **Backend quality:** Every endpoint matches its Phase 0.6 contract exactly; business logic enforces the validation and security rules defined there without exception.
+- **Database quality:** Every schema element matches Phase 0.5's entity model exactly, including ownership, relationship, and deletion-rule fidelity.
+- **API quality:** Consistent request/response/error shapes across every module, per Phase 0.6 — no module introduces a one-off convention.
+- **Documentation quality:** Every phase's spec follows the template in Section 3; this roadmap and all Phase 0.x documents remain internally consistent as new phases are added.
+- **Code review philosophy:** Even as a solo developer, each phase's implementation is reviewed against its own written spec and against this roadmap's Development Rules (Section 4) before being considered complete — the written spec serves as the review checklist.
+
+---
+
+# 7. Testing Strategy
+
+- **Unit testing philosophy:** Core business logic — Points ledger calculations, prediction settlement, leaderboard computation — is covered by unit tests that verify correctness independent of the full system, prioritized over exhaustive UI-level unit testing.
+- **Integration testing philosophy:** Critical cross-module flows (placing a prediction and verifying the resulting Points Transaction and Portfolio update together) are covered by integration tests that exercise real module boundaries, per Phase 0.6's contracts.
+- **Manual testing:** Every phase undergoes a manual walkthrough against its own Completion Criteria before being marked complete; a full manual regression pass across all Core Features occurs during Phase 20.
+- **Regression testing:** As new phases are added, previously completed phases are periodically re-verified (informally per-phase, formally during Phase 20) to catch any unintended breakage introduced by later work.
+- **Bug fixing workflow:** Bugs discovered during or after a phase are fixed under a `fix:` commit (per Section 5) within the current phase if found before completion, or as a dedicated fix branch/commit against `main` if found afterward — bugs are never silently patched without a corresponding commit trail.
+
+---
+
+# 8. Deployment Roadmap
+
+- **Development:** Local development environment, using the technology stack from Phase 0.3, throughout Phases 1–20.
+- **Staging:** A production-equivalent environment (Vercel for frontend, Railway for backend, Supabase for database/auth/storage) stood up in Phase 21, used to validate the platform before real users are exposed to it.
+- **Production:** The live environment, served under the project's custom domain via Cloudflare DNS (per Phase 0.3), stood up as the final step of Phase 21 and opened to the public in Phase 22.
+- **Rollback philosophy:** Every production deployment is expected to be reversible — the deployment process (finalized in detail during Phase 21) must support returning to the previous known-good state if a release introduces a critical issue.
+- **Environment separation:** Development, staging, and production use entirely separate databases, environment variables, and credentials at all times — no environment ever shares live data or secrets with another, consistent with Phase 0.3's Security Standards.
+
+---
+
+# 9. Release Strategy
+
+- **Alpha:** Internal-only milestone, reached once the core prediction loop (Phases 1–11) is functionally complete, used solely for the developer's own end-to-end validation.
+- **Beta:** A limited, controlled release reached once Phases 12–17 are complete, allowing real (but limited/invited) usage to surface issues before full hardening.
+- **Release Candidate:** The build produced at the end of Phase 20 (Testing) — considered launch-ready pending final Security Hardening (Phase 19, sequenced appropriately) and Deployment (Phase 21) validation.
+- **Production Release:** The result of Phase 22 — the platform is live and publicly accessible.
+- **Hotfix Releases:** Post-launch, urgent fixes bypass the standard phase sequence only to the extent needed to resolve the specific issue, are branched, committed, and tagged following the same Git Workflow (Section 5), and are documented after the fact in the changelog (per Phase 0.3's Documentation Standards).
+
+---
+
+# 10. Maintenance Philosophy
+
+- **Bug fixes:** Handled per the Bug Fixing Workflow in Section 7, prioritized by severity and user impact.
+- **Feature updates:** Post-launch features are treated as new, fully-specified phases (following the Section 3 template) rather than ad hoc additions — the phase-based discipline continues after Production Launch, not just before it.
+- **Documentation updates:** Every maintenance change that affects architecture, data model, API contracts, or design is reflected back into the relevant Phase 0.x document as a formal, documented amendment, keeping the foundational documents perpetually accurate.
+- **Performance monitoring:** Ongoing observation of the benchmarks established in Phase 18, with regressions treated as bugs under the standard workflow.
+- **Future scalability:** Growth-driven changes (e.g. new categories, increased user volume) are evaluated against the scalability philosophy already established in Phases 0.2 and 0.5 before any structural change is made.
+
+---
+
+# 11. Risk Management
+
+- **Scope creep:** Mitigated by the Development Rules (Section 4) and the strict phase-by-phase discipline established in the README and reinforced throughout every Phase 0.x document.
+- **Breaking changes:** Mitigated by the API versioning philosophy (Phase 0.6) and the requirement that `main` always remains in a working state (Section 5).
+- **Performance issues:** Addressed proactively through Phase 18 and the performance philosophies already embedded in Phases 0.3 and 0.6, rather than deferred entirely to a single late-stage effort.
+- **Security issues:** Addressed proactively through the security standards already embedded in Phases 0.3 and 0.6, with a dedicated verification pass in Phase 19.
+- **Database migrations:** Managed carefully given the permanence/immutability rules in Phase 0.5 — schema changes that could affect historical data (Points Transactions, Prediction History) require explicit, documented review before being applied, even after Production Launch.
+- **API compatibility:** Managed through the versioning and backward-compatibility rules in Phase 0.6 — no endpoint contract is broken without a new API version.
+
+---
+
+# 12. Success Criteria
+
+The platform is considered officially production-ready when all of the following are true:
+
+1. All functional phases (1–17) are complete, each having met its own Completion Criteria.
+2. Performance Optimization (Phase 18) has met its established benchmarks.
+3. Security Hardening (Phase 19) has found no remaining known high-severity issues.
+4. Testing (Phase 20) shows critical-path automated test coverage and a clean manual regression pass.
+5. Deployment (Phase 21) has produced a validated staging environment and a correctly configured production environment (custom domain, DNS, environment separation).
+6. The platform, end to end, faithfully reflects the approved prototype's design (Phase 0.4), the data model (Phase 0.5), and the API contracts (Phase 0.6), with no unresolved contradictions between documentation and implementation.
+7. The Points-only rule (README, and every subsequent document) holds with zero exceptions anywhere in the implemented system.
+
+---
+
+# 13. Out of Scope for Phase 0.7
+
+This document defines planning and roadmap only, in written form. It explicitly does **not** create:
+
+- No Frontend
+- No Backend
+- No Database
+- No Authentication
+- No APIs
+- No Deployment
+- No Implementation of any kind
+
+Only planning. Every phase named in Section 2 will produce its own detailed spec and implementation only when it becomes the explicitly active phase.
+
+---
+
+# 14. Completion Criteria
+
+Phase 0.7 is considered complete when:
+
+1. This document exists at `docs/Phase-0.7-Development-Roadmap-and-Implementation-Plan.md` and is committed with a `docs:` commit, per Phase 0.3's Git Standards.
+2. Every phase from 1 through 22 is listed in the roadmap (Section 2) and summarized using the template from Section 3, with clear dependencies on prior phases and this project's existing documentation (Phases 0.2–0.6).
+3. Development, Git, quality, testing, deployment, release, and maintenance practices (Sections 4–10) are fully defined with no open questions.
+4. Risks (Section 11) and Success Criteria (Section 12) are explicitly documented.
+5. The document contains no application code, schema, or implementation of any kind.
+6. The document has been reviewed and explicitly approved by the project owner as the permanent execution roadmap for the rest of the project.
+
+Once these conditions are met, Phase 0.7 is closed, and the foundational documentation set (Phases 0.1–0.7) is complete. Phase 1 (Project Initialization) may then begin, implementing the static homepage using the technology stack (Phase 0.3) and design system (Phase 0.4) already locked.
+
+---
+
+*This document is permanent project documentation. It may only be changed through an explicit, documented amendment approved by the project owner — never silently overridden or reinterpreted by a future session, request, or AI assistant.*
+
