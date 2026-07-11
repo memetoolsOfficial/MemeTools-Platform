@@ -1,0 +1,363 @@
+# Phase 0.6 — API Specification and Backend Contracts
+
+**Phase:** 0.6 — API Specification and Backend Contracts
+**Type:** Permanent API Contract Documentation (No Code)
+**Depends On:** `README.md`, `docs/Phase-0.2-Project-Folder-Structure.md`, `docs/Phase-0.3-Technology-Stack-and-Development-Standards.md`, `docs/Phase-0.4-Design-System-and-UI-Standards.md`, `docs/Phase-0.5-Database-Schema-Planning.md`
+**Status:** Locked — this document defines the binding API contract for every future backend and frontend implementation phase
+
+---
+
+## Purpose of This Document
+
+This document defines, in plain language, the complete API contract between the frontend (Next.js) and backend (NestJS) established in Phase 0.3, built on top of the data model defined in Phase 0.5. It specifies how the API is structured, secured, versioned, validated, and organized into modules — without writing any controllers, services, DTOs, or implementation code of any kind.
+
+This document exists so that when Phase 2 onward implement real endpoints, every decision about URL shape, response format, error handling, and module responsibility has already been made and agreed upon — implementation becomes a faithful translation of this contract, not a series of new design decisions made ad hoc.
+
+This document is bound by, and does not contradict, the README's permanent rule that the platform is Points-only. No endpoint, payload, or response format described here represents real money, fiat currency, cryptocurrency transactions, or blockchain wallet operations.
+
+---
+
+# 1. API Philosophy
+
+- **REST principles:** The API follows REST conventions — resources are nouns (e.g. `markets`, `predictions`), operations are expressed through standard HTTP methods, and URLs represent resource hierarchies rather than actions (e.g. `/markets/:id/predictions`, not `/getPredictionsForMarket`).
+- **Consistency:** Every module (Section 7) follows the same request, response, error, pagination, and naming patterns defined in this document — a developer who understands one module's contract already understands the shape of every other module.
+- **Versioning philosophy:** The API is versioned from day one (Section 2), so future breaking changes never silently disrupt existing frontend code.
+- **Scalability:** The API is designed assuming high request volume on read-heavy endpoints (Markets, Leaderboard, Activity Feed) and is structured so that pagination, filtering, and caching (Section 11) are first-class concerns, not afterthoughts.
+- **Maintainability:** Each module's contract maps directly to one entity or entity group from Phase 0.5, so ownership of an endpoint is always unambiguous.
+- **Security-first design:** Every endpoint is classified explicitly as public, authenticated, or admin-only (Section 3) before any implementation begins — no endpoint is built without its access level already decided.
+
+---
+
+# 2. API Versioning
+
+- **Base URL philosophy:** All API traffic is served under a single, predictable, versioned base path (e.g. conceptually `/api/v1/...`), never bare (`/api/...`) and never per-module-versioned.
+- **API version format:** Versions are expressed as a simple integer prefix (`v1`, `v2`, etc.) in the base path — no date-based or header-based versioning is used, to keep version identification simple and visible.
+- **Future version strategy:** A new version (`v2`) is introduced only when a change would break existing contracts defined in this document (e.g. a fundamentally different response shape) — additive, non-breaking changes (new optional fields, new endpoints) are added within the existing version.
+- **Backward compatibility philosophy:** Once a version is released, its existing endpoints' request/response contracts are never changed in a breaking way. Backward-incompatible changes always ship as a new version, running alongside the old version until the frontend is fully migrated.
+
+---
+
+# 3. Authentication Rules
+
+- **Public endpoints:** Endpoints that serve information with no user-specific context and no sensitivity — e.g. browsing Markets, Categories, and the public Leaderboard — are accessible without authentication, consistent with allowing prospective users to explore the platform before signing up (matching the "Explore Markets" flow in the prototype).
+- **Authenticated endpoints:** Any endpoint that reads or writes user-specific data — Predictions, Portfolio, Watchlist, Points Balance/Transactions, Notifications, User Settings, Profile edits — requires a valid authenticated session and operates only on the identity of the currently authenticated user.
+- **Admin-only endpoints:** Endpoints that create or modify platform-wide data — Market/Category management, Reward/Achievement definitions, System Configuration, viewing Audit Logs — require the requesting user to hold Admin User status (per Phase 0.5), verified on every request, not just at login.
+- **Authorization philosophy:** Authentication (who are you) and authorization (what are you allowed to do) are always checked as two distinct steps — a valid authenticated session alone never grants access to another user's data or to admin-only operations.
+- **Session validation:** Every authenticated and admin-only request validates the session against Supabase Auth (per Phase 0.3) on every call — sessions are never trusted purely based on a client-supplied identifier without server-side verification.
+- **Token philosophy:** The API relies on Supabase Auth's token mechanism for identifying the requesting user; the backend never issues or manages a separate, parallel authentication token system.
+
+---
+
+# 4. Standard Request Rules
+
+- **HTTP methods:** `GET` for retrieval (no side effects), `POST` for creation, `PATCH` for partial updates, `PUT` reserved for full-resource replacement where genuinely needed, `DELETE` for removal (which, per Phase 0.5, triggers a soft delete wherever historical integrity applies).
+- **Headers:** Every request includes a `Content-Type` header appropriate to its payload (JSON for all request/response bodies, with no alternative formats supported).
+- **Authentication header:** Authenticated and admin-only requests include a standard bearer-style authorization header carrying the Supabase-issued session token — no custom header scheme is introduced.
+- **Content-Type:** All request and response bodies are JSON; the API does not support form-encoded or XML payloads.
+- **Pagination philosophy:** Any endpoint returning a list of resources that could grow large (Markets, Predictions, Activity Feed, Leaderboard, Notifications) is paginated by default — no endpoint returns an unbounded list. Pagination uses a consistent page/limit (or cursor, for high-growth feeds like Activity Feed) pattern across every module.
+- **Filtering philosophy:** List endpoints support filtering by the fields relevant to that resource (e.g. Markets filtered by Category or status) using consistent query-parameter naming across modules.
+- **Sorting philosophy:** List endpoints that have an obvious default sort order (Trending Markets by volume, Leaderboard by rank, Activity Feed by recency) apply that default automatically, while allowing an explicit sort parameter to override it where more than one reasonable ordering exists.
+- **Search philosophy:** Endpoints that back the platform's search bar (Markets search, per Phase 0.4's design system) accept a single, consistent search query parameter, applied server-side rather than requiring the client to fetch and filter data locally.
+
+---
+
+# 5. Standard Response Format
+
+Every API response — success or failure — follows one consistent envelope structure, described conceptually below (no implementation code):
+
+### Success Responses
+- A successful response includes: a clear success indicator, the requested `data` (an object for a single resource, an array for a list), and an optional `meta` block (Section 5's Metadata Philosophy) for pagination or supplementary context.
+
+### Error Responses
+- An error response includes: a clear failure indicator, an `error` block containing a machine-readable error code, a human-readable message, and (where relevant) details about which field or condition caused the failure — never a raw stack trace or internal system detail (per Security Standards, Section 10).
+
+### Validation Responses
+- A validation failure is a specific category of error response that additionally includes a structured list of field-level issues (which field failed, why), so the frontend can map errors directly to form fields.
+
+### Empty Responses
+- Endpoints that represent successful actions with no meaningful data to return (e.g. deleting a Watchlist entry) return the same success envelope with an empty or minimal `data` value, never an inconsistent or bodyless response.
+
+### Pagination Responses
+- Paginated list responses include, within the `meta` block: the current page/cursor position, the page size, and — where feasible for the given entity's scale (per Phase 0.5's performance philosophy) — the total count or an indication that more results are available.
+
+### Metadata Philosophy
+- The `meta` block is reserved exclusively for response-shape information (pagination, applied filters/sort) — it never carries business data that belongs in `data`.
+
+---
+
+# 6. Standard Error Handling
+
+- **HTTP status codes:** Standard, conventional status codes are used consistently across every module: `200`/`201` for success, `400` for validation errors, `401` for authentication failures, `403` for authorization failures, `404` for missing resources, `409` for conflicts, `429` for rate limiting, `500` for unexpected server errors. No module invents its own non-standard status code usage.
+- **Validation errors (400):** Returned when request input fails structural or business validation (Section 9) before any business logic executes.
+- **Authentication errors (401):** Returned when a request to an authenticated or admin-only endpoint lacks a valid session.
+- **Authorization errors (403):** Returned when a request has a valid session but lacks permission for the specific action (e.g. a non-admin calling an admin-only endpoint, or a user attempting to access another user's Portfolio).
+- **Resource not found (404):** Returned when a requested resource (by ID) does not exist or is not visible to the requester (e.g. a soft-deleted resource behaves as not found for non-admin requests).
+- **Conflict errors (409):** Returned when a request would violate a uniqueness or state-consistency rule (e.g. attempting to predict on a Market that has already closed).
+- **Rate limit philosophy:** Endpoints that are especially sensitive to abuse (authentication attempts, prediction placement) are subject to rate limiting; when exceeded, a `429` response is returned with guidance on retry timing, never a silent failure.
+- **Unexpected server errors (500):** Returned for genuinely unanticipated failures; the response never exposes internal error details, stack traces, or database structure to the client, consistent with Security Standards (Section 10).
+
+---
+
+# 7 & 8. API Modules and Endpoint Responsibilities
+
+Each module below maps directly to its corresponding entity or entity group from Phase 0.5, and follows the request/response/error standards defined in Sections 4–6.
+
+### Authentication
+- **Purpose:** Coordinates sign-up, login, logout, and session handling in partnership with Supabase Auth.
+- **Responsibilities:** Initiating and terminating sessions; issuing the identity context every other module relies on.
+- **Operations supported:** Sign up, log in, log out, session refresh/validation.
+- **Expected behaviour:** Never stores raw credentials itself; delegates credential handling to Supabase Auth and manages the resulting session.
+- **Ownership:** Owns the authentication flow only; user profile/settings creation triggered at sign-up is delegated to the Users/Profiles modules.
+- **Dependencies:** Supabase Auth (Phase 0.3).
+
+### Users
+- **Purpose:** Manages core account identity, per the Users entity in Phase 0.5.
+- **Responsibilities:** Creating a User record at sign-up; providing identity lookups needed by other modules.
+- **Operations supported:** Retrieve current user identity; deactivate (soft-delete) an account.
+- **Expected behaviour:** Never exposes another user's private identity data through any endpoint.
+- **Ownership:** Owns identity only, not presentation (Profiles) or configuration (User Settings).
+- **Dependencies:** Authentication module.
+
+### Profiles
+- **Purpose:** Manages public-facing user information, per the Profiles entity.
+- **Responsibilities:** Serving public profile data (for Leaderboard, Activity Feed attribution) and allowing a user to update their own public profile.
+- **Operations supported:** Retrieve a profile (self or public view of another user); update own profile.
+- **Expected behaviour:** Public profile reads are available to any authenticated (or, where appropriate, public) request; updates are restricted to the profile's owner.
+- **Ownership:** Owns display data only.
+- **Dependencies:** Users module.
+
+### Markets
+- **Purpose:** Serves market data and, for Admins, market management, per the Markets entity.
+- **Responsibilities:** Listing, searching, and filtering markets; retrieving a single market's detail; supporting the homepage's Trending Markets and future full Markets browsing (Phase 4).
+- **Operations supported:** List/search/filter markets; retrieve a single market; (admin) create/update/close a market.
+- **Expected behaviour:** Public read access; write access restricted to Admin API (Section 12).
+- **Ownership:** Owns market-level facts and current pricing, derived from Market Options and Predictions per Phase 0.5.
+- **Dependencies:** Categories module; Market Options and Predictions data.
+
+### Categories
+- **Purpose:** Serves category data (Memecoins, Layer 1 & Majors, etc.), per the Categories entity.
+- **Responsibilities:** Listing categories with their active/"Soon" status and market counts, matching Phase 0.4's sidebar design.
+- **Operations supported:** List categories; (admin) create/update a category.
+- **Expected behaviour:** Public read access; write access restricted to Admin API.
+- **Ownership:** Owns category metadata only.
+- **Dependencies:** None (foundational reference data for Markets).
+
+### Predictions
+- **Purpose:** Manages a user's placed positions on markets, per the Predictions entity.
+- **Responsibilities:** Accepting new predictions, validating market eligibility (open, not closed) and sufficient Points Balance, and reflecting a user's active predictions.
+- **Operations supported:** Place a prediction; list a user's active predictions; retrieve a single prediction's detail.
+- **Expected behaviour:** Always authenticated; a placed prediction always produces a corresponding Points Transaction (Section 7's Points module) atomically — a prediction is never recorded without its Points being correctly debited.
+- **Ownership:** Owns the fact of a user's position; does not own market-level aggregate pricing (that's derived, per Phase 0.5).
+- **Dependencies:** Markets, Points, and Points Transactions modules.
+
+### Prediction History
+- **Purpose:** Serves a user's resolved prediction history, per the Prediction History entity.
+- **Responsibilities:** Providing the historical record used for Portfolio History, accuracy statistics, and Leaderboard calculation.
+- **Operations supported:** List a user's historical (resolved) predictions.
+- **Expected behaviour:** Read-only from the API's perspective — entries are populated internally at settlement time (Section 7's Predictions/Markets settlement flow), never created directly via a client-facing write endpoint.
+- **Ownership:** Owns historical/resolved facts only.
+- **Dependencies:** Predictions and Markets modules.
+
+### Portfolio
+- **Purpose:** Serves a user's current holdings summary, per the Portfolio entity.
+- **Responsibilities:** Aggregating a user's currently active predictions into a single current-state view.
+- **Operations supported:** Retrieve the current user's portfolio summary.
+- **Expected behaviour:** Always authenticated, always scoped to the requesting user; read-only, since it's a derived projection (per Phase 0.5).
+- **Ownership:** Owns the current summary only.
+- **Dependencies:** Predictions and Points modules.
+
+### Portfolio History
+- **Purpose:** Serves historical portfolio snapshots, per the Portfolio History entity.
+- **Responsibilities:** Providing time-series data for portfolio trend visualization.
+- **Operations supported:** List a user's portfolio history over a given range.
+- **Expected behaviour:** Read-only; snapshot creation is an internal, scheduled process, not a client-facing write endpoint.
+- **Ownership:** Owns time-series snapshots only.
+- **Dependencies:** Portfolio module.
+
+### Watchlist
+- **Purpose:** Manages a user's saved markets, per the Watchlist relationship.
+- **Responsibilities:** Adding/removing a market from a user's watchlist and listing it.
+- **Operations supported:** Add to watchlist; remove from watchlist; list current watchlist.
+- **Expected behaviour:** Always authenticated, always scoped to the requesting user; removal is the one legitimate hard-delete case identified in Phase 0.5.
+- **Ownership:** Owns the save/unsave relationship only.
+- **Dependencies:** Markets module.
+
+### Leaderboard
+- **Purpose:** Serves ranked user standings, per the Leaderboard entity.
+- **Responsibilities:** Providing the current computed ranking, refreshed on a defined cadence (per Phase 0.5's performance philosophy) rather than live per-event.
+- **Operations supported:** List the current leaderboard (with pagination/filtering by period, if applicable).
+- **Expected behaviour:** Public read access, consistent with the Leaderboard being a core, shareable Core Feature.
+- **Ownership:** Owns computed ranking output only, not the underlying performance facts (Prediction History, Points Transactions).
+- **Dependencies:** Prediction History and Points Transactions modules.
+
+### Points
+- **Purpose:** Serves a user's current Points Balance, per the Points Balance entity.
+- **Responsibilities:** Providing the authoritative current balance for display (e.g. in the navbar, Portfolio).
+- **Operations supported:** Retrieve current balance.
+- **Expected behaviour:** Always authenticated, always scoped to the requesting user; read-only from the client's perspective — balance changes only ever occur as a side effect of other operations (Predictions, Rewards) via the Points Transactions ledger, never through a direct "set balance" endpoint.
+- **Ownership:** Owns the current-state number only.
+- **Dependencies:** Points Transactions module.
+
+### Points Transactions
+- **Purpose:** Serves the immutable Points ledger, per the Points Transactions entity.
+- **Responsibilities:** Providing a user's full transaction history for transparency (e.g. a "Points history" view).
+- **Operations supported:** List a user's transaction history.
+- **Expected behaviour:** Read-only via the client-facing API; entries are only ever created internally as a side effect of other operations (placing a Prediction, settlement, claiming a Reward), never created directly by a client request.
+- **Ownership:** Owns the append-only ledger.
+- **Dependencies:** Referenced by Predictions, Rewards, and Admin modules as the cause of ledger entries.
+
+### Rewards
+- **Purpose:** Serves the XP/perks program, per the Rewards entity.
+- **Responsibilities:** Listing available rewards, a user's progress, and handling reward claims.
+- **Operations supported:** List available rewards; retrieve current user's progress; claim an eligible reward.
+- **Expected behaviour:** Claiming a reward always produces a corresponding Points Transaction where applicable, following the same atomicity expectation as Predictions.
+- **Ownership:** Owns reward definitions and progress/claim state.
+- **Dependencies:** Points Transactions module; Admin API for reward definition management.
+
+### Achievements
+- **Purpose:** Serves milestone-based recognitions tied to Rewards, per the Achievements entity.
+- **Responsibilities:** Listing achievement definitions and which have been earned by the requesting user.
+- **Operations supported:** List achievements; retrieve current user's earned achievements.
+- **Expected behaviour:** Achievement-earned status is set internally when milestone conditions are met, not via a direct client-facing "mark achieved" endpoint.
+- **Ownership:** Owns milestone definitions and earned status.
+- **Dependencies:** Prediction History, Points Transactions (as sources of milestone conditions).
+
+### Activity Feed
+- **Purpose:** Serves the global, public activity log, per the Activity Feed entity.
+- **Responsibilities:** Providing the platform-wide chronological feed shown in the Recent Activity widget (Phase 0.4).
+- **Operations supported:** List recent activity (paginated by recency).
+- **Expected behaviour:** Public read access; entries are created internally as a side effect of notable events (market creation, predictions placed), never directly by a client-facing write endpoint.
+- **Ownership:** Owns the public feed entries only.
+- **Dependencies:** References Users, Markets, and Predictions as the subjects of each entry.
+
+### Notifications
+- **Purpose:** Serves user-specific, targeted alerts, per the Notifications entity.
+- **Responsibilities:** Listing a user's notifications and managing read/unread state.
+- **Operations supported:** List notifications; mark as read.
+- **Expected behaviour:** Always authenticated, always scoped to the requesting user; creation is internal, triggered by relevant events elsewhere in the system.
+- **Ownership:** Owns per-user delivery/read state only.
+- **Dependencies:** Referenced by Predictions, Rewards, and Admin modules as sources of notification-worthy events.
+
+### User Settings
+- **Purpose:** Manages account-level configuration, per the User Settings entity.
+- **Responsibilities:** Serving and updating a user's preferences (e.g. notification preferences).
+- **Operations supported:** Retrieve current settings; update settings.
+- **Expected behaviour:** Always authenticated, always scoped to the requesting user.
+- **Ownership:** Owns configuration/preferences only.
+- **Dependencies:** Users module.
+
+### Admin
+- **Purpose:** Serves all administrative operations, per the Admin Users and Admin Actions entities.
+- **Responsibilities:** Gatekeeping and logging every administrative action across Markets, Categories, Rewards, and System Configuration (see Section 12).
+- **Operations supported:** Varies by sub-resource, always restricted to Admin Users, always logged to Admin Actions.
+- **Expected behaviour:** Every admin write operation is both authorized (Admin User check) and logged (Admin Actions entry) as a single expected behavior, not two separately optional steps.
+- **Ownership:** Owns administrative gatekeeping and logging.
+- **Dependencies:** Every module that supports admin-managed data (Markets, Categories, Rewards, System Configuration).
+
+### System Configuration
+- **Purpose:** Serves platform-wide configurable values, per the System Configuration entity.
+- **Responsibilities:** Providing global defaults (e.g. starting Points balance for new users) to other modules internally, and exposing them for Admin management.
+- **Operations supported:** (Admin) retrieve and update system configuration values.
+- **Expected behaviour:** Read access to configuration values needed by other modules is internal (server-to-server), not necessarily a public API surface; admin management is explicitly Admin-only.
+- **Ownership:** Owns global configuration only.
+- **Dependencies:** Referenced internally by Users (default balance), Predictions (limits), etc.
+
+### Audit Logs
+- **Purpose:** Serves the security-focused audit trail, per the Audit Logs entity.
+- **Responsibilities:** Providing Admins with a tamper-evident view of sensitive operations.
+- **Operations supported:** (Admin) list and filter audit log entries.
+- **Expected behaviour:** Read-only via the API; entries are created internally, only as a side effect of genuinely sensitive operations (Section 10).
+- **Ownership:** Owns the security-relevant history only.
+- **Dependencies:** Referenced by every module capable of a sensitive/administrative operation.
+
+---
+
+# 9. Validation Philosophy
+
+- **Input validation:** Every request payload is validated for structural correctness (required fields present, correct types/formats) before any business logic runs — malformed input never reaches business logic.
+- **Business validation:** Beyond structural correctness, requests are validated against business rules from Phase 0.5 (e.g. a Prediction cannot be placed on a closed Market; a user cannot spend more Points than their current balance).
+- **Authorization validation:** Every request is validated against the requester's actual permission to act on the specific target resource (e.g. a user can only update their own Profile, never another user's), independent of and in addition to authentication.
+- **Output validation:** Responses are shaped to include only the fields defined for that module's contract — internal-only fields (e.g. raw audit metadata) are never accidentally included in a standard response.
+- **Consistency rules:** Validation logic for a given business rule (e.g. "Points Balance must never go negative") is enforced in exactly one place conceptually, not duplicated and potentially inconsistent across multiple endpoints that touch Points.
+
+---
+
+# 10. Security Standards
+
+- **Authentication requirements:** Every endpoint's authentication requirement (public, authenticated, admin-only) is explicitly defined per Section 3 — no endpoint is ambiguous about its requirement.
+- **Authorization rules:** Ownership-based authorization (a user can only act on their own Predictions, Portfolio, Watchlist, Points, Notifications, Settings) is enforced on every relevant request, regardless of what the request payload itself claims.
+- **Input sanitization:** All user-supplied input (especially search queries and any free-text fields) is treated as untrusted and sanitized before use, preventing injection-style abuse.
+- **Rate limiting philosophy:** Sensitive or abuse-prone endpoints (authentication, prediction placement, reward claims) are rate-limited per user/session; exceeding limits produces the `429` response defined in Section 6, never silent throttling with no feedback.
+- **Sensitive data handling:** No endpoint response ever includes secrets, internal identifiers not meant for client use, or another user's private data; consistent with Phase 0.3's Security Standards, no API key or credential is ever returned in a response body.
+- **Logging philosophy:** Server-side logs capture enough context to debug issues without logging sensitive user data (e.g. full session tokens) in plaintext.
+- **Audit philosophy:** Every sensitive administrative or system-level action (Points corrections, permission changes, System Configuration changes) is captured in Audit Logs as a mandatory side effect of the operation, not an optional add-on.
+
+---
+
+# 11. Performance Standards
+
+- **Pagination:** Applied by default to every list endpoint capable of unbounded growth (Section 4), preventing any single request from returning an excessively large payload.
+- **Caching philosophy:** Data that changes infrequently (Categories, System Configuration) is cached more aggressively at the API layer than data that changes constantly (live Market pricing, Activity Feed) — matching the caching philosophy already established in Phase 0.3.
+- **Filtering:** Supported consistently on every list endpoint where filtering is meaningful (Markets by Category, Activity Feed by type), reducing the need for clients to fetch broad data and filter locally.
+- **Searching:** Server-side search (Markets, and any future searchable module) is designed to remain performant as the underlying dataset grows into the range anticipated in Phase 0.5.
+- **Sorting:** Default sort orders are applied server-side to avoid requiring the client to re-sort large datasets after fetching.
+- **Response size philosophy:** Each module's response includes only the fields that module's consumers actually need — modules do not return deeply nested, unrelated entity data "just in case" (e.g. a Markets list response does not embed every historical Prediction for that market).
+- **Future scalability:** The API's reliance on pagination, filtering, and caching from day one means that as the underlying data grows to the scale anticipated in Phase 0.5 (millions of users/predictions), the API layer does not require a fundamental redesign — only tuning of existing, already-designed mechanisms.
+
+---
+
+# 12. Admin API Philosophy
+
+- **Market management:** Admins can create, update, close, and settle Markets and their Market Options; every such action requires Admin authorization and produces an Admin Actions entry.
+- **Category management:** Admins can create and update Categories, including toggling active/"Soon" status; logged the same way as Market management.
+- **Reward management:** Admins define and update Rewards and Achievements (thresholds, XP values, perks); logged the same way.
+- **Moderation:** Any future moderation-specific action is modeled as a specialized Admin Action rather than a separate system, consistent with Phase 0.5.
+- **Audit logs:** Admins have read access to Audit Logs for reviewing sensitive historical operations; this access itself is subject to the same Admin-only authorization rules as every other Admin endpoint.
+- **Administrative permissions:** Not all Admin Users are assumed to have identical permissions in the long term — the Admin API contract anticipates that permission granularity (e.g. Market management vs. Reward management as separate privileges) may be introduced in a future phase without changing this document's overall philosophy, only its specific permission checks.
+
+---
+
+# 13. API Documentation Standards
+
+- **Naming conventions:** API documentation uses the same naming conventions locked in Phase 0.3 — kebab-case for URL path segments, camelCase for JSON field names in request/response bodies.
+- **Endpoint naming:** Endpoints are named after the resource they represent, not the action performed (e.g. `POST /predictions` to create a prediction, not `POST /create-prediction`), consistent with REST principles in Section 1.
+- **Module naming:** Each module's documentation uses the exact module names defined in Section 7, so there is a single, unambiguous name for each area of the API across all future documentation.
+- **Documentation consistency:** Every future module's documentation follows the same structure used in Section 8 of this document (Purpose, Responsibilities, Operations Supported, Expected Behaviour, Ownership, Dependencies) — no module is documented in a structurally different way.
+
+---
+
+# 14. Out of Scope for Phase 0.6
+
+This document defines the API contract only, in written form. It explicitly does **not** define or produce:
+
+- No Backend code
+- No Controllers
+- No Services
+- No DTOs
+- No Entities
+- No NestJS implementation
+- No Prisma implementation
+- No Database queries
+- No Authentication implementation
+- No Frontend integration
+
+Any of the above will be introduced only in their designated future phase, implemented using the technology stack locked in Phase 0.3 and the data model locked in Phase 0.5, and must faithfully implement — never contradict — the contracts defined in this document.
+
+---
+
+# 15. Completion Criteria
+
+Phase 0.6 is considered complete when:
+
+1. This document exists at `docs/Phase-0.6-API-Specification-and-Backend-Contracts.md` and is committed with a `docs:` commit, per the Git Standards in Phase 0.3.
+2. Every module listed in Section 7 has a fully written Purpose, Responsibilities, Operations Supported, Expected Behaviour, Ownership, and Dependencies description in Section 8.
+3. The standard request rules, response format, and error handling (Sections 4–6) are specific enough that any future endpoint's shape can be inferred directly from this document without inventing new conventions.
+4. Authentication and authorization rules (Section 3) leave no endpoint's access level ambiguous.
+5. The document contains no backend code, controller signatures, DTOs, or implementation of any kind.
+6. The document has been reviewed and explicitly approved by the project owner as the permanent API contract for all subsequent backend and frontend phases.
+
+Once these conditions are met, Phase 0.6 is closed. Actual endpoint implementation begins only in its designated future phase, and must faithfully translate this document into NestJS controllers, services, and DTOs using the technology and data model locked in Phases 0.3 and 0.5.
+
+---
+
+*This document is permanent project documentation. It may only be changed through an explicit, documented amendment approved by the project owner — never silently overridden or reinterpreted by a future session, request, or AI assistant.*
