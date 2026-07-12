@@ -3,48 +3,59 @@
 @tailwind utilities;
 
 /*
-  NOTE: The CSS variables below are neutral, default scaffolding values only.
-  They establish the theming mechanism (shadcn/ui-compatible CSS variables)
-  required by tailwind.config.ts and components.json. The exact colors,
-  locked in docs/Phase-0.4-Design-System-and-UI-Standards.md (dark background,
-  violet accent, semantic green/red), are applied when actual UI
-  implementation begins — not during this initialization-only phase.
+  Design tokens implementing docs/Phase-0.4-Design-System-and-UI-Standards.md,
+  derived directly from assets/prototypes/homepage-prototype.png (the sole
+  visual source of truth). Dark theme only — there is no light theme in scope.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* Base app background — near-black with a purple undertone */
+    --background: 240 65% 5%;
+    --foreground: 210 20% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    /* Card / surface — slightly lighter than the base background */
+    --card: 240 40% 8%;
+    --card-foreground: 210 20% 98%;
 
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    /* Popover surfaces (menus, tooltips) share the card treatment */
+    --popover: 240 40% 8%;
+    --popover-foreground: 210 20% 98%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    /* Primary accent — the signature violet used for CTAs and active state */
+    --primary: 257 73% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    /* Secondary — muted dark surface for outlined buttons and inactive pills */
+    --secondary: 240 30% 13%;
+    --secondary-foreground: 210 15% 92%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    /* Muted — secondary/supporting text and low-emphasis surfaces */
+    --muted: 240 25% 13%;
+    --muted-foreground: 240 12% 65%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    /* Accent — hover/emphasis variant of the primary violet */
+    --accent: 257 78% 58%;
+    --accent-foreground: 0 0% 100%;
 
-    --positive: 142 71% 45%;
-    --positive-foreground: 0 0% 98%;
+    /* Semantic: Yes / positive movement (reserved exclusively for this meaning) */
+    --positive: 132 70% 54%;
+    --positive-foreground: 0 0% 100%;
 
-    --negative: 0 84.2% 60.2%;
-    --negative-foreground: 0 0% 98%;
+    /* Semantic: No / negative movement (reserved exclusively for this meaning) */
+    --negative: 3 81% 57%;
+    --negative-foreground: 0 0% 100%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    /* Destructive mirrors negative for form/validation contexts */
+    --destructive: 3 81% 57%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Borders / dividers — subtle, low-contrast */
+    --border: 240 25% 16%;
+    --input: 240 25% 16%;
+    --ring: 257 73% 50%;
+
+    --radius: 0.875rem;
   }
 }
 
@@ -53,6 +64,30 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  /* Hero section background — deep violet glow fading into the base background,
+     matching the prototype's hero panel. */
+  .bg-hero-gradient {
+    background:
+      radial-gradient(120% 140% at 78% 15%, hsl(262 70% 22% / 0.55) 0%, transparent 55%),
+      radial-gradient(90% 90% at 15% 85%, hsl(262 60% 14% / 0.4) 0%, transparent 60%),
+      hsl(258 30% 9%);
+  }
+
+  /* Subtle glow behind the hero mascot artwork */
+  .bg-mascot-glow {
+    background: radial-gradient(closest-side, hsl(262 83% 62% / 0.35), transparent 70%);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

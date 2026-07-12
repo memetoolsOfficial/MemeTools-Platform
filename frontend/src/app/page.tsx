@@ -1,13 +1,27 @@
-// NOTE: This is a bare placeholder page, required only so the initialized
-// application has something to render and `next build` / `next dev`
-// succeed. It deliberately does not implement the approved homepage
-// prototype or design system — that is scoped to its own future
-// implementation phase per docs/Phase-0.7-Development-Roadmap-and-Implementation-Plan.md.
+import { AppShell } from '@/app-shell/app-shell';
+import { DashboardPage } from '@/features/dashboard/components/dashboard-page';
+import { TrendingNowWidget } from '@/features/leaderboard/components/trending-now-widget';
+import { RecentActivityWidget } from '@/features/activity-feed/components/recent-activity-widget';
 
-export default function RootPage() {
+// The MemeTools homepage — implemented to match
+// assets/prototypes/homepage-prototype.png, per
+// docs/Phase-0.4-Design-System-and-UI-Standards.md. All data below is
+// local mock data (see feature `data/` folders); there is no API,
+// database, or authentication in this phase.
+
+export default function HomePage() {
   return (
-    <main>
-      <p>MemeTools — project initialized. Homepage implementation begins in the next phase.</p>
-    </main>
+    <AppShell
+      activeNavItem="Home"
+      activeNavTab="Markets"
+      rightRail={
+        <>
+          <TrendingNowWidget />
+          <RecentActivityWidget />
+        </>
+      }
+    >
+      <DashboardPage />
+    </AppShell>
   );
 }
