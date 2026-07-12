@@ -28,7 +28,7 @@ export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: Navbar
 
       <SearchBar />
 
-      <nav className="ml-2 hidden flex-1 items-center justify-center gap-8 lg:flex">
+      <nav aria-label="Primary" className="ml-2 hidden flex-1 items-center justify-center gap-8 lg:flex">
         {NAV_TABS.map((tab) => {
           const isActive = tab.label === activeTab;
           return (
@@ -37,7 +37,7 @@ export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: Navbar
               href={tab.href}
               prefetch={false}
               className={cn(
-                'relative py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground',
+                'relative rounded py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 isActive && 'text-primary',
               )}
               aria-current={isActive ? 'page' : undefined}

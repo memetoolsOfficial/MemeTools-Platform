@@ -12,7 +12,7 @@ export function CategoryPillCard({ category }: CategoryPillCardProps) {
     <Link
       href={`/markets?category=${category.id}`}
       prefetch={false}
-      className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-secondary"
+      className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <IconBadge glyph={category.glyph} bgClassName={category.bgClassName} size="md" />
       <div className="whitespace-nowrap">

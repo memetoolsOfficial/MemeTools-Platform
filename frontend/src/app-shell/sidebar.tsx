@@ -12,10 +12,13 @@ interface SidebarProps {
 
 export function Sidebar({ activeItem = 'Home' }: SidebarProps) {
   return (
-    <aside className="hidden w-64 shrink-0 flex-col gap-6 border-r border-border px-4 py-6 lg:flex">
+    <aside
+      aria-label="Sidebar"
+      className="hidden w-64 shrink-0 flex-col gap-6 border-r border-border px-4 py-6 lg:flex"
+    >
       <SidebarMascotPromo />
 
-      <nav className="flex flex-col gap-1">
+      <nav aria-label="Primary" className="flex flex-col gap-1">
         {PRIMARY_NAV_ITEMS.map((item) => (
           <SidebarNavItem
             key={item.label}
@@ -27,7 +30,7 @@ export function Sidebar({ activeItem = 'Home' }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="flex flex-col gap-1">
+      <nav aria-label="Categories" className="flex flex-col gap-1">
         <p className="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Categories
         </p>
@@ -37,11 +40,11 @@ export function Sidebar({ activeItem = 'Home' }: SidebarProps) {
         <Link
           href="/markets"
           prefetch={false}
-          className="px-3 pt-1 text-sm font-medium text-primary hover:underline"
+          className="rounded-lg px-3 pt-1 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           View all categories
         </Link>
-      </div>
+      </nav>
 
       <div className="mt-auto">
         <SidebarCta />

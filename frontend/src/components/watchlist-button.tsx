@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 
 interface WatchlistButtonProps {
   marketTitle: string;
+  defaultSaved?: boolean;
   className?: string;
 }
 
@@ -15,8 +16,8 @@ interface WatchlistButtonProps {
  * phase). Local component state gives the control a real interactive feel
  * without persisting anything or implying a working feature.
  */
-export function WatchlistButton({ marketTitle, className }: WatchlistButtonProps) {
-  const [isSaved, setIsSaved] = useState(false);
+export function WatchlistButton({ marketTitle, defaultSaved = false, className }: WatchlistButtonProps) {
+  const [isSaved, setIsSaved] = useState(defaultSaved);
 
   return (
     <button
