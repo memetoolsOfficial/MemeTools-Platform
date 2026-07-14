@@ -107,10 +107,3 @@ export const MOCK_TRENDING_MARKETS: MarketMock[] = [
 ];
 
 export const MARKET_FILTER_TABS = ['Top', 'New', 'Memecoins', 'Solana', 'Events'] as const;
-
-export const PLATFORM_STATS = [
-  { label: 'Total Volume', value: '$24.7M+' },
-  { label: 'Traders', value: '512K+' },
-  { label: 'Markets', value: '2,341+' },
-  { label: 'Avg. Accuracy', value: '78.6%' },
-] as const;

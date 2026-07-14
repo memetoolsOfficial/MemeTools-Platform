@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { IconBadge } from '@/components/icon-badge';
@@ -8,13 +9,14 @@ interface TrendingNowItemProps {
   item: TrendingNowItemMock;
 }
 
-export function TrendingNowItem({ item }: TrendingNowItemProps) {
+/** Memoized in Phase 2.3 — renders inside a static, unchanging list. */
+function TrendingNowItemComponent({ item }: TrendingNowItemProps) {
   return (
     <li>
       <Link
         href="/markets"
         prefetch={false}
-        className="-mx-1 flex items-center gap-3 rounded-lg px-1 py-3 transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="-mx-1 flex items-center gap-3 rounded-lg px-1 py-3 transition-colors duration-150 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="sr-only">Rank {item.rank}: </span>
         <span aria-hidden="true" className="w-4 shrink-0 text-sm font-semibold text-muted-foreground">
@@ -40,3 +42,5 @@ export function TrendingNowItem({ item }: TrendingNowItemProps) {
     </li>
   );
 }
+
+export const TrendingNowItem = memo(TrendingNowItemComponent);

@@ -9,7 +9,7 @@ export function BrandMark() {
       </span>
       <span className="text-lg font-extrabold tracking-tight text-foreground">
         MEME<span className="italic">TOOLS</span>
-        <span className="text-primary">&apos;</span>
+        <span className="text-accent">&apos;</span>
       </span>
     </Link>
   );

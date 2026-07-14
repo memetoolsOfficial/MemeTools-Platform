@@ -17,7 +17,7 @@ export function FooterLinkColumn({ title, links }: FooterLinkColumnProps) {
             <Link
               href={link.href}
               prefetch={false}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
+              className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:rounded"
             >
               {link.label}
             </Link>

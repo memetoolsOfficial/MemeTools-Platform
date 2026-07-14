@@ -22,7 +22,7 @@ export function WatchlistPreviewWidget() {
           <Link
             href="/markets"
             prefetch={false}
-            className="text-sm font-medium text-primary hover:underline"
+            className="text-sm font-medium text-accent hover:underline"
           >
             Browse markets
           </Link>

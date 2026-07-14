@@ -17,7 +17,7 @@ export function SectionHeader({ title, viewAllHref, children }: SectionHeaderPro
         <Link
           href={viewAllHref}
           prefetch={false}
-          className="text-sm font-medium text-primary hover:underline"
+          className="text-sm font-medium text-accent hover:underline"
         >
           View all
         </Link>

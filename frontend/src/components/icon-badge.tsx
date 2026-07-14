@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface IconBadgeProps {
@@ -18,8 +19,11 @@ const sizeClasses = {
  * matching the prototype's token-style icons. Uses representative emoji
  * glyphs rather than exact brand SVG assets, since no icon-asset pipeline
  * exists yet — see docs/Phase-2.1-Static-Homepage.md, Known Limitations.
+ *
+ * Memoized in Phase 2.3 since it renders many times per list (market
+ * rows, category cards, widget items) with stable, simple props.
  */
-export function IconBadge({ glyph, bgClassName, size = 'md', className }: IconBadgeProps) {
+function IconBadgeComponent({ glyph, bgClassName, size = 'md', className }: IconBadgeProps) {
   return (
     <div
       className={cn(
@@ -34,3 +38,5 @@ export function IconBadge({ glyph, bgClassName, size = 'md', className }: IconBa
     </div>
   );
 }
+
+export const IconBadge = memo(IconBadgeComponent);

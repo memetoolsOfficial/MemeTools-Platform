@@ -17,7 +17,11 @@ export function MarketFilterTabs({ 'aria-controls': ariaControls }: MarketFilter
   const [active, setActive] = useState<(typeof MARKET_FILTER_TABS)[number]>('Top');
 
   return (
-    <div role="tablist" aria-label="Filter trending markets" className="flex items-center gap-2">
+    <div
+      role="tablist"
+      aria-label="Filter trending markets"
+      className="scrollbar-none flex min-w-0 items-center gap-2 overflow-x-auto"
+    >
       {MARKET_FILTER_TABS.map((tab) => {
         const isActive = tab === active;
         return (
@@ -29,7 +33,7 @@ export function MarketFilterTabs({ 'aria-controls': ariaControls }: MarketFilter
             aria-controls={ariaControls}
             onClick={() => setActive(tab)}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               isActive
                 ? 'bg-primary text-primary-foreground'
                 : 'border border-border bg-transparent text-muted-foreground hover:bg-secondary hover:text-foreground',

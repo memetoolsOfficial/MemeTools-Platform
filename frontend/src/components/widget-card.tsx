@@ -1,3 +1,6 @@
+'use client';
+
+import { AnimatePresence, motion } from 'framer-motion';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { SectionHeader } from '@/components/section-header';
 
@@ -11,25 +14,34 @@ interface WidgetCardProps {
 /**
  * The reusable "sidebar widget" pattern — header with title + optional
  * "View all" link, and a divided list of rows below — per
- * docs/Phase-0.4-Design-System-and-UI-Standards.md, Section 4 ("The
- * right rail's two widgets... use identical internal padding and
- * spacing rhythm to each other, establishing a reusable 'sidebar
- * widget' pattern for any future right-rail content").
+ * docs/Phase-0.4-Design-System-and-UI-Standards.md, Section 4.
  *
- * Introduced in Phase 2.2 to remove the duplicated Card/CardHeader/
- * SectionHeader markup that Trending Now and Recent Activity each
- * implemented separately in Phase 2.1. Renders `children` (each
- * expected to be an <li>) inside a semantic <ul>, so list structure is
- * conveyed natively rather than through ARIA role overrides.
+ * Phase 2.3 adds a soft crossfade (via AnimatePresence, keyed on
+ * `isLoading`) between the skeleton and loaded states, instead of an
+ * abrupt swap, and a subtle hover elevation on the card itself.
  */
 export function WidgetCard({ title, viewAllHref, children, isLoading = false }: WidgetCardProps) {
   return (
-    <Card aria-busy={isLoading}>
+    <Card
+      aria-busy={isLoading}
+      className="transition-shadow duration-200 hover:shadow-md hover:shadow-black/10"
+    >
       <CardHeader className="pb-0">
         <SectionHeader title={title} viewAllHref={viewAllHref} />
       </CardHeader>
       <CardContent className="pt-2">
-        <ul className="divide-y divide-border">{children}</ul>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.ul
+            key={isLoading ? 'loading' : 'loaded'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="divide-y divide-border"
+          >
+            {children}
+          </motion.ul>
+        </AnimatePresence>
       </CardContent>
     </Card>
   );

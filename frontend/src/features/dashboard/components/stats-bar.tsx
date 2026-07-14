@@ -28,16 +28,16 @@ export function StatsBar() {
       <Link
         href="/rewards"
         prefetch={false}
-        className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 transition-colors hover:bg-primary/15"
+        className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 transition-all duration-150 hover:-translate-y-0.5 hover:bg-primary/15 hover:shadow-md hover:shadow-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-primary">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-accent">
           <Gift className="h-4 w-4" aria-hidden="true" />
         </span>
         <div>
-          <p className="text-sm font-semibold text-primary">Rewards Program</p>
+          <p className="text-sm font-semibold text-accent">Rewards Program</p>
           <p className="text-xs text-muted-foreground">Earn XP &amp; unlock perks</p>
         </div>
-        <ChevronRight className="ml-2 h-4 w-4 text-primary" aria-hidden="true" />
+        <ChevronRight className="ml-2 h-4 w-4 text-accent" aria-hidden="true" />
       </Link>
     </div>
   );

@@ -34,20 +34,31 @@
     --muted: 240 25% 13%;
     --muted-foreground: 240 12% 65%;
 
-    /* Accent — hover/emphasis variant of the primary violet */
-    --accent: 257 78% 58%;
+    /* Accent — brightened in Phase 2.3 (WCAG AA-verified via automated
+       axe-core audit: 4.9–5.4:1 contrast against every background/card
+       surface it appears on, vs. 2.4–2.6:1 for the raw --primary hue).
+       Used for all readable violet TEXT (links, active nav/tab state,
+       "Active" category badges) — --primary itself is unchanged and
+       still drives button fills, borders, and pill backgrounds, since
+       those only need to meet the lower 3:1 non-text/UI-component
+       threshold, which the original hue already satisfies. */
+    --accent: 257 80% 68%;
     --accent-foreground: 0 0% 100%;
 
     /* Semantic: Yes / positive movement (reserved exclusively for this meaning) */
     --positive: 132 70% 54%;
     --positive-foreground: 0 0% 100%;
 
-    /* Semantic: No / negative movement (reserved exclusively for this meaning) */
-    --negative: 3 81% 57%;
+    /* Semantic: No / negative movement (reserved exclusively for this meaning).
+       Lightness nudged 57%→62% in Phase 2.3 — the original value scored
+       4.3:1 contrast (axe-core-detected AA failure) against its own
+       15%-opacity pill background; 62% clears 4.5:1 with margin while
+       remaining the same hue/red. */
+    --negative: 3 81% 62%;
     --negative-foreground: 0 0% 100%;
 
     /* Destructive mirrors negative for form/validation contexts */
-    --destructive: 3 81% 57%;
+    --destructive: 3 81% 62%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders / dividers — subtle, low-contrast */

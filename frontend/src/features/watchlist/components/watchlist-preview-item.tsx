@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { IconBadge } from '@/components/icon-badge';
@@ -9,13 +10,14 @@ interface WatchlistPreviewItemProps {
   item: WatchlistPreviewItemMock;
 }
 
-export function WatchlistPreviewItem({ item }: WatchlistPreviewItemProps) {
+/** Memoized in Phase 2.3 — renders inside a static, unchanging list. */
+function WatchlistPreviewItemComponent({ item }: WatchlistPreviewItemProps) {
   return (
     <li className="flex items-center gap-3 py-3">
       <Link
         href="/markets"
         prefetch={false}
-        className="-mx-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-1 py-0.5 transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="-mx-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-1 py-0.5 transition-colors duration-150 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <IconBadge glyph={item.glyph} bgClassName={item.bgClassName} size="sm" />
         <div className="min-w-0 flex-1">
@@ -35,3 +37,5 @@ export function WatchlistPreviewItem({ item }: WatchlistPreviewItemProps) {
     </li>
   );
 }
+
+export const WatchlistPreviewItem = memo(WatchlistPreviewItemComponent);

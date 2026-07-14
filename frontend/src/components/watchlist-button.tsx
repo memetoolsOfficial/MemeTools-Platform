@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,14 +29,22 @@ export function WatchlistButton({ marketTitle, defaultSaved = false, className }
         isSaved ? `Remove ${marketTitle} from watchlist` : `Add ${marketTitle} to watchlist`
       }
       className={cn(
-        'flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-all duration-150 hover:scale-105 hover:bg-secondary hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className,
       )}
     >
-      <Star
-        className={cn('h-4 w-4', isSaved && 'fill-primary text-primary')}
-        aria-hidden="true"
-      />
+      <motion.span
+        key={isSaved ? 'saved' : 'unsaved'}
+        initial={{ scale: 0.7 }}
+        animate={{ scale: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+        className="flex"
+      >
+        <Star
+          className={cn('h-4 w-4', isSaved && 'fill-primary text-accent')}
+          aria-hidden="true"
+        />
+      </motion.span>
     </button>
   );
 }

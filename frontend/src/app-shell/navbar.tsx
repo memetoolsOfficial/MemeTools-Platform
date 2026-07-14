@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import { BrandMark } from './components/brand-mark';
 import { SearchBar } from './components/search-bar';
 import { MobileNav } from './components/mobile-nav';
 import { Button } from '@/components/ui/button';
+import { useScrollShadow } from '@/hooks/use-scroll-shadow';
 import { cn } from '@/lib/utils';
 import type { PrimaryNavLabel } from './nav-items';
 
@@ -19,9 +22,23 @@ interface NavbarProps {
   activeNavItem?: PrimaryNavLabel;
 }
 
+/**
+ * Phase 2.3 adds: a subtle shadow/border-strengthening once the page
+ * scrolls beneath the sticky navbar (useScrollShadow), and a mobile
+ * search toggle so search remains reachable below `md` (where the
+ * desktop SearchBar is hidden).
+ */
 export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: NavbarProps) {
+  const isScrolled = useScrollShadow();
+
   return (
-    <header className="sticky top-0 z-30 flex h-20 w-full items-center gap-4 border-b border-border bg-background px-4 sm:px-6">
+    <header
+      className={cn(
+        'sticky top-0 z-30 flex h-20 w-full items-center gap-2 border-b bg-background/95 px-3 backdrop-blur transition-shadow duration-200 sm:gap-4 sm:px-6',
+        'relative',
+        isScrolled ? 'border-border shadow-lg shadow-black/20' : 'border-transparent',
+      )}
+    >
       <MobileNav activeItem={activeNavItem} />
 
       <BrandMark />
@@ -37,8 +54,8 @@ export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: Navbar
               href={tab.href}
               prefetch={false}
               className={cn(
-                'relative rounded py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                isActive && 'text-primary',
+                'relative rounded py-2 text-sm font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                isActive && 'text-accent',
               )}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -51,12 +68,21 @@ export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: Navbar
         })}
       </nav>
 
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <Button variant="secondary" size="default" asChild>
-          <Link href="/login" prefetch={false}>Log in</Link>
+      <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
+        <Button variant="secondary" size="default" className="hidden sm:inline-flex" asChild>
+          <Link href="/login" prefetch={false}>
+            Log in
+          </Link>
         </Button>
-        <Button variant="primary" size="default" asChild>
-          <Link href="/signup" prefetch={false}>Sign up</Link>
+        <Button variant="primary" size="sm" className="sm:hidden" asChild>
+          <Link href="/signup" prefetch={false}>
+            Sign up
+          </Link>
+        </Button>
+        <Button variant="primary" size="default" className="hidden sm:inline-flex" asChild>
+          <Link href="/signup" prefetch={false}>
+            Sign up
+          </Link>
         </Button>
       </div>
     </header>

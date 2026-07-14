@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { MarketFilterTabs } from './market-filter-tabs';
 import { MarketRow } from './market-row';
@@ -19,7 +20,11 @@ export function TrendingMarketsSection() {
           <h2 className="text-lg font-bold text-foreground">Trending Markets</h2>
           <MarketFilterTabs aria-controls="trending-markets-list" />
         </div>
-        <Link href="/markets" prefetch={false} className="text-sm font-medium text-primary hover:underline">
+        <Link
+          href="/markets"
+          prefetch={false}
+          className="text-sm font-medium text-accent hover:underline"
+        >
           View all
         </Link>
       </div>
@@ -35,17 +40,26 @@ export function TrendingMarketsSection() {
         <ChevronRight className="h-4 w-4 justify-self-end" aria-hidden="true" />
       </div>
 
-      <div id="trending-markets-list">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <MarketRowSkeleton key={i} />)
-          : MOCK_TRENDING_MARKETS.map((market) => <MarketRow key={market.id} market={market} />)}
-      </div>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          id="trending-markets-list"
+          key={isLoading ? 'loading' : 'loaded'}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => <MarketRowSkeleton key={i} />)
+            : MOCK_TRENDING_MARKETS.map((market) => <MarketRow key={market.id} market={market} />)}
+        </motion.div>
+      </AnimatePresence>
 
       <div className="mt-2 flex justify-center">
         <Link
           href="/markets"
           prefetch={false}
-          className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="flex items-center gap-1 text-sm font-medium text-accent hover:underline"
         >
           View all trending markets
           <ChevronRight className="h-4 w-4" aria-hidden="true" />

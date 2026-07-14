@@ -4,17 +4,18 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100',
   {
     variants: {
       variant: {
         // "Sign Up" / "Explore Markets" / "Get Started" — solid violet fill
-        primary: 'bg-primary text-primary-foreground hover:bg-accent',
+        primary:
+          'bg-primary text-primary-foreground shadow-sm hover:brightness-110 hover:shadow-lg hover:shadow-primary/25',
         // "Log in" / "How it works" — transparent with a visible border
         secondary:
           'border border-border bg-transparent text-foreground hover:bg-secondary',
         ghost: 'bg-transparent text-foreground hover:bg-secondary',
-        link: 'text-primary underline-offset-4 hover:underline p-0 h-auto font-medium',
+        link: 'text-accent underline-offset-4 hover:underline p-0 h-auto font-medium',
       },
       size: {
         default: 'h-11 px-5 py-2',

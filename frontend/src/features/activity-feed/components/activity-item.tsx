@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { IconBadge } from '@/components/icon-badge';
@@ -13,7 +14,8 @@ const ACTION_COLOR: Record<NonNullable<ActivityItemMock['actionVariant']>, strin
   neutral: 'text-muted-foreground',
 };
 
-export function ActivityItem({ item }: ActivityItemProps) {
+/** Memoized in Phase 2.3 — renders inside a static, unchanging list. */
+function ActivityItemComponent({ item }: ActivityItemProps) {
   const actionColor = ACTION_COLOR[item.actionVariant ?? 'neutral'];
 
   return (
@@ -21,7 +23,7 @@ export function ActivityItem({ item }: ActivityItemProps) {
       <Link
         href="/markets"
         prefetch={false}
-        className="-mx-1 flex items-start gap-3 rounded-lg px-1 py-3 transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="-mx-1 flex items-start gap-3 rounded-lg px-1 py-3 transition-colors duration-150 hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <IconBadge glyph={item.glyph} bgClassName={item.bgClassName} size="sm" />
         <div className="min-w-0 flex-1">
@@ -36,3 +38,5 @@ export function ActivityItem({ item }: ActivityItemProps) {
     </li>
   );
 }
+
+export const ActivityItem = memo(ActivityItemComponent);

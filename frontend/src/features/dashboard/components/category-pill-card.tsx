@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Link from 'next/link';
 import { IconBadge } from '@/components/icon-badge';
 import { formatCount } from '@/lib/format';
@@ -7,12 +8,13 @@ interface CategoryPillCardProps {
   category: CategoryMock;
 }
 
-export function CategoryPillCard({ category }: CategoryPillCardProps) {
+/** Memoized in Phase 2.3 — renders inside a static, unchanging list. */
+function CategoryPillCardComponent({ category }: CategoryPillCardProps) {
   return (
     <Link
       href={`/markets?category=${category.id}`}
       prefetch={false}
-      className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex shrink-0 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-all duration-150 hover:-translate-y-0.5 hover:bg-secondary hover:shadow-md hover:shadow-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <IconBadge glyph={category.glyph} bgClassName={category.bgClassName} size="md" />
       <div className="whitespace-nowrap">
@@ -24,3 +26,5 @@ export function CategoryPillCard({ category }: CategoryPillCardProps) {
     </Link>
   );
 }
+
+export const CategoryPillCard = memo(CategoryPillCardComponent);
