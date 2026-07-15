@@ -1,6 +1,7 @@
 import { Navbar } from './navbar';
 import { Sidebar } from './sidebar';
 import { Footer } from './footer';
+import { Reveal } from '@/components/reveal';
 import type { PrimaryNavLabel } from './nav-items';
 
 interface AppShellProps {
@@ -21,6 +22,11 @@ interface AppShellProps {
  *
  * Includes a "skip to main content" link and semantic landmarks
  * (nav/main/aside/footer), added in Phase 2.2's accessibility pass.
+ *
+ * Phase 2.4: `main` now has `tabIndex={-1}` so activating the skip
+ * link actually moves keyboard focus there (not just scroll position),
+ * and `scroll-mt-20` so it lands below the sticky navbar instead of
+ * partially hidden beneath it — "proper anchor behavior, no jump."
  */
 export function AppShell({ children, rightRail, activeNavItem, activeNavTab }: AppShellProps) {
   return (
@@ -37,7 +43,11 @@ export function AppShell({ children, rightRail, activeNavItem, activeNavTab }: A
       <div className="mx-auto flex w-full max-w-[1800px] flex-1 gap-6 px-4 py-6 sm:px-6">
         <Sidebar activeItem={activeNavItem} />
 
-        <main id="main-content" className="min-w-0 flex-1">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-w-0 flex-1 scroll-mt-20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           {children}
         </main>
 
@@ -51,7 +61,9 @@ export function AppShell({ children, rightRail, activeNavItem, activeNavTab }: A
         )}
       </div>
 
-      <Footer />
+      <Reveal>
+        <Footer />
+      </Reveal>
     </div>
   );
 }

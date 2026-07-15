@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark scroll-smooth">
       <body className="min-h-screen overflow-x-hidden font-sans">
         <MotionProvider>{children}</MotionProvider>
       </body>

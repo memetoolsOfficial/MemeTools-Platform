@@ -2,38 +2,39 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Reveal } from '@/components/reveal';
+import { StaggerGroup, StaggerItem } from '@/components/reveal';
 
 /**
- * Hero section. Mobile mascot visibility fix and type-scale from Phase
- * 2.2 preserved unchanged. Phase 2.3 adds a subtle staggered fade/slide
- * entrance (via Reveal) to the badge, headline, subtext, and CTAs —
- * no layout, spacing, color, or copy changes.
+ * Hero section. Phase 2.3 added the staggered entrance and mobile
+ * mascot visibility fix. Phase 2.4 refactors the manual per-element
+ * `delay` increments into a single `StaggerGroup`/`StaggerItem` pair
+ * (parent-driven stagger timing, defined once) — same visual result,
+ * less duplicated code. No layout, spacing, color, or copy changes.
  */
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden rounded-2xl border border-border bg-hero-gradient px-6 py-10 sm:px-10">
-      <div className="relative z-10 flex flex-col gap-6 lg:max-w-xl">
-        <Reveal delay={0}>
+      <StaggerGroup className="relative z-10 flex flex-col gap-6 lg:max-w-xl">
+        <StaggerItem>
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-accent">
             <span className="h-2 w-2 animate-pulse rounded-full bg-primary" aria-hidden="true" />
             LIVE
           </span>
-        </Reveal>
+        </StaggerItem>
 
-        <Reveal delay={0.08}>
+        <StaggerItem>
           <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Predict the <span className="text-accent">future.</span>
           </h1>
-        </Reveal>
+        </StaggerItem>
 
-        <Reveal delay={0.16}>
+        <StaggerItem>
           <p className="max-w-md text-base leading-relaxed text-muted-foreground">
             From memecoins to major events. All markets. One platform.
           </p>
-        </Reveal>
+        </StaggerItem>
 
-        <Reveal delay={0.24}>
+        <StaggerItem>
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="primary" size="lg" asChild>
               <Link href="/markets" prefetch={false}>
@@ -47,8 +48,8 @@ export function HeroSection() {
               </Link>
             </Button>
           </div>
-        </Reveal>
-      </div>
+        </StaggerItem>
+      </StaggerGroup>
 
       {/* Mobile: smaller mascot shown below the copy, preserving the
           artwork instead of hiding it, per Phase 0.4 Section 8. */}

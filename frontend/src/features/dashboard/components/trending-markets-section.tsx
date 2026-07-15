@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { MarketFilterTabs } from './market-filter-tabs';
 import { MarketRow } from './market-row';
@@ -41,7 +41,7 @@ export function TrendingMarketsSection() {
       </div>
 
       <AnimatePresence mode="wait" initial={false}>
-        <motion.div
+        <m.div
           id="trending-markets-list"
           key={isLoading ? 'loading' : 'loaded'}
           initial={{ opacity: 0 }}
@@ -52,7 +52,7 @@ export function TrendingMarketsSection() {
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => <MarketRowSkeleton key={i} />)
             : MOCK_TRENDING_MARKETS.map((market) => <MarketRow key={market.id} market={market} />)}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
 
       <div className="mt-2 flex justify-center">

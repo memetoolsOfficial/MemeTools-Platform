@@ -2,7 +2,7 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { IconBadge } from '@/components/icon-badge';
 import { PercentageIndicator } from '@/components/percentage-indicator';
 import { MarketPricePills } from '@/components/market-price-pills';
@@ -31,7 +31,7 @@ interface MarketRowProps {
  */
 function MarketRowComponent({ market }: MarketRowProps) {
   return (
-    <motion.div
+    <m.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
       className="relative rounded-xl border-b border-border py-4 transition-shadow duration-150 last:border-b-0 hover:border-b-transparent hover:bg-secondary/40 hover:shadow-md hover:shadow-black/20"
@@ -97,7 +97,7 @@ function MarketRowComponent({ market }: MarketRowProps) {
 
         <MarketPricePills yesCents={market.yesCents} noCents={market.noCents} />
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

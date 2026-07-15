@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Menu, X, LogIn, Search } from 'lucide-react';
 import { BrandMark } from './brand-mark';
 import { SidebarNavItem } from './sidebar-nav-item';
@@ -76,7 +76,7 @@ export function MobileNav({ activeItem = 'Home' }: MobileNavProps) {
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            <motion.button
+            <m.button
               type="button"
               aria-label="Close navigation menu"
               onClick={handleClose}
@@ -86,7 +86,7 @@ export function MobileNav({ activeItem = 'Home' }: MobileNavProps) {
               transition={{ duration: 0.2 }}
               className="absolute inset-0 bg-black/70"
             />
-            <motion.div
+            <m.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -152,7 +152,7 @@ export function MobileNav({ activeItem = 'Home' }: MobileNavProps) {
                 </Link>
                 <SidebarCta />
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

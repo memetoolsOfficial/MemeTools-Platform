@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +33,7 @@ export function WatchlistButton({ marketTitle, defaultSaved = false, className }
         className,
       )}
     >
-      <motion.span
+      <m.span
         key={isSaved ? 'saved' : 'unsaved'}
         initial={{ scale: 0.7 }}
         animate={{ scale: 1 }}
@@ -44,7 +44,7 @@ export function WatchlistButton({ marketTitle, defaultSaved = false, className }
           className={cn('h-4 w-4', isSaved && 'fill-primary text-accent')}
           aria-hidden="true"
         />
-      </motion.span>
+      </m.span>
     </button>
   );
 }

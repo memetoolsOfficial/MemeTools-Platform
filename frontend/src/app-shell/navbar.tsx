@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { m } from 'framer-motion';
 import { BrandMark } from './components/brand-mark';
 import { SearchBar } from './components/search-bar';
 import { MobileNav } from './components/mobile-nav';
@@ -27,6 +28,10 @@ interface NavbarProps {
  * scrolls beneath the sticky navbar (useScrollShadow), and a mobile
  * search toggle so search remains reachable below `md` (where the
  * desktop SearchBar is hidden).
+ *
+ * Phase 2.4 adds: the active-tab underline now animates in via a
+ * shared `layoutId`, giving it a smooth spring entrance instead of
+ * appearing instantly.
  */
 export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: NavbarProps) {
   const isScrolled = useScrollShadow();
@@ -61,7 +66,11 @@ export function Navbar({ activeTab = 'Markets', activeNavItem = 'Home' }: Navbar
             >
               {tab.label}
               {isActive && (
-                <span className="absolute inset-x-0 -bottom-[1px] h-0.5 rounded-full bg-primary" />
+                <m.span
+                  layoutId="navbar-tab-underline"
+                  className="absolute inset-x-0 -bottom-[1px] h-0.5 rounded-full bg-primary"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
               )}
             </Link>
           );
