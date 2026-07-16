@@ -1,0 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models are introduced incrementally with their owning data-layer phase.
+// This schema establishes the shared PostgreSQL connection and generated
+// Prisma Client required by the authentication foundation.
