@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { MotionProvider } from '@/components/providers/motion-provider';
+import { AuthProvider } from '@/components/providers/auth-provider';
 
 // Single, clean, modern sans-serif typeface used throughout the entire
 // product, per docs/Phase-0.4-Design-System-and-UI-Standards.md, Section 3
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body className="min-h-screen overflow-x-hidden font-sans">
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider><AuthProvider>{children}</AuthProvider></MotionProvider>
       </body>
     </html>
   );
