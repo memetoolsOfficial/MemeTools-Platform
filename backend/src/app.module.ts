@@ -5,6 +5,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './core/prisma/prisma.module';
 import { SupabaseModule } from './core/supabase/supabase.module';
 import { HealthModule } from './modules/health/health.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { HealthModule } from './modules/health/health.module';
     PrismaModule,
     SupabaseModule,
     AuthModule,
+    ProfilesModule,
     HealthModule,
   ],
 })

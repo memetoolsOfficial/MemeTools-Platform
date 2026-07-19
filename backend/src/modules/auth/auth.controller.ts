@@ -11,6 +11,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import { Session } from '@supabase/supabase-js';
+import { ProfilesService } from '../profiles/profiles.service';
 import { AuthService } from './auth.service';
 import { CredentialsDto, PasswordResetDto, PasswordResetRequestDto } from './dto/auth.dto';
 
@@ -21,6 +22,7 @@ const REFRESH_COOKIE = 'memetools_refresh_token';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly profilesService: ProfilesService,
     private readonly config: ConfigService,
   ) {}
 
@@ -32,6 +34,7 @@ export class AuthController {
   ) {
     this.assertSameOrigin(request);
     const result = await this.authService.signUp(credentials.email, credentials.password);
+    if (result.data.user) await this.profilesService.ensureProfileForUser(result.data.user);
     if (result.data.session) this.setSessionCookies(response, result.data.session);
     return {
       user: this.userPayload(result.data.user),
