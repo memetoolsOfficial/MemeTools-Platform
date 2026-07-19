@@ -7,6 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models are introduced incrementally with their owning data-layer phase.
-// This schema establishes the shared PostgreSQL connection and generated
-// Prisma Client required by the authentication foundation.
+model Profile {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @db.Uuid
+  username    String   @unique
+  displayName String
+  bio         String?
+  avatarUrl   String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([username])
+}
